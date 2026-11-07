@@ -69,69 +69,6 @@ flowchart LR
 | Alerts | Telegram Bot API (live location, messages, audio documents) |
 | Hosting | Render, or any host that serves HTTPS |
 
-## Setup
-
-You need Python 3.10 or newer, Chrome or Edge (desktop or Android), and a Telegram account.
-
-**1. Install**
-
-```bash
-git clone <your-repo-url> saathi
-cd saathi
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r backend/requirements.txt
-cp .env.example .env               # Windows: copy .env.example .env
-```
-
-**2. Create the Telegram bot**
-
-1. In Telegram, open **@BotFather**, send `/newbot`, and follow the prompts.
-2. Paste the token it gives you into `.env` as `TELEGRAM_BOT_TOKEN`.
-3. Ask each trusted contact to open your bot and send `/start`. A bot can't message anyone who hasn't done this.
-
-**3. Add an LLM key**
-
-Create a key at [console.groq.com](https://console.groq.com) and paste it into `.env` as `LLM_API_KEY`. Model names change over time, so check what's currently available:
-
-```bash
-curl https://api.groq.com/openai/v1/models -H "Authorization: Bearer <your key>"
-```
-
-Pick a fast chat model and set it as `LLM_MODEL`. For reasoning models, keep `LLM_REASONING_EFFORT=low`; for other models, leave it empty. To use a different provider, change `LLM_BASE_URL` (see `.env.example`). If no key is set, calls still work, using a few pre-written lines.
-
-**4. Run**
-
-```bash
-uvicorn backend.main:app --reload
-```
-
-Open http://localhost:8000 in Chrome. Enter your name, choose a caller and a code phrase, click **Find contacts**, tick who should get alerts, and click **Send a test message** to check that it arrives. Then click **Start call**.
-
-**Testing on a phone.** Browsers only allow the microphone and location over HTTPS, or on localhost. To try Saathi on your phone, either deploy it (below) or expose your laptop with a tunnel such as `ngrok http 8000`.
-
-### Deploy on Render
-
-1. Push the repo to GitHub, then on Render create a **Web Service** from it.
-2. Set the build command to `pip install -r backend/requirements.txt`.
-3. Set the start command to `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`.
-4. Add the variables from `.env.example` under **Environment**.
-
-Free instances sleep after a period of inactivity, so open the app a minute before a demo.
-
-## API
-
-| Method and path | Purpose |
-| --- | --- |
-| `GET /api/health` | Whether the LLM and Telegram are configured, and the bot's username |
-| `POST /api/chat` | Next line from the caller, given the conversation so far |
-| `GET /api/contacts/discover` | People who have sent `/start` to the bot |
-| `POST /api/test-alert` | Sends a test message to the chosen contacts |
-| `POST /api/session/start` | Tells contacts a call started and begins live location |
-| `POST /api/session/location` | Moves the live location pin (throttled to once every 8 s) |
-| `POST /api/alert` | Sends the silent alert with location |
-| `POST /api/alert/audio` | Forwards the audio clip recorded after an alert |
-| `POST /api/session/end` | Tells contacts the call ended |
 
 ## Project structure
 
@@ -147,21 +84,5 @@ saathi/
 ├── .env.example
 └── README.md
 ```
-
-## Demo video outline
-
-1. **The problem (20 s).** A woman is alone in a cab at night and the driver takes a turn she doesn't recognise.
-2. **Setup (20 s).** Choose the caller and code phrase, find contacts, and send a test message.
-3. **The call (60 s).** Turn on captions for the video. Have a short natural conversation, then say the code phrase.
-4. **The alert (30 s).** Show the contact's Telegram on a second phone: the alert, the live pin moving, and the audio clip. Point out the caller's reply about the location.
-5. **How it works and what's next (30 s).**
-
-## Limitations and next steps
-
-- **Browser speech recognition.** It needs an internet connection and works best in Chrome or Edge. On Android it may play a short beep when it restarts, and it pauses when the screen turns off. Saathi keeps the screen awake during a call to avoid this.
-- **Audio clip.** Recording alongside speech recognition works in desktop Chrome. Some Android phones may skip the clip.
-- **Server restarts.** Sessions live in memory. If the server restarts mid-call, the live pin stops updating, but alerts still go through, because every alert carries its own contact list.
-- **No accounts.** Anyone with the URL can use the bot. A real deployment needs user accounts, a flow for linking contacts to each user, and rate limiting.
-- **Next steps.** A native Android app (background listening, a lock-screen or power-button trigger), an SMS fallback when there's no data, on-device speech recognition, more Indian languages, and a handoff to 112 India.
 
 
