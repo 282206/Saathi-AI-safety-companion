@@ -1,4 +1,4 @@
-# Saathi (साथी)
+# Saathi 
 
 An AI phone call that keeps you company when you don't feel safe, and quietly alerts the people you trust the moment you say a code phrase.
 
@@ -163,13 +163,4 @@ saathi/
 - **No accounts.** Anyone with the URL can use the bot. A real deployment needs user accounts, a flow for linking contacts to each user, and rate limiting.
 - **Next steps.** A native Android app (background listening, a lock-screen or power-button trigger), an SMS fallback when there's no data, on-device speech recognition, more Indian languages, and a handoff to 112 India.
 
-## Team
 
-| Name | Role |
-| --- | --- |
-| Gitika Gangwar | B.Tech CSE (AI & ML), Manipal University Jaipur |
-| | |
-
-## Credits
-
-Icons adapted from [Feather](https://feathericons.com) (MIT licence).
