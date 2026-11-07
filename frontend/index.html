@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F6FA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#12162A" media="(prefers-color-scheme: dark)">
+  <title>Saathi</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📞</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="setup" class="setup">
+  <header class="brand">
+    <h1>Saathi <span lang="hi">साथी</span></h1>
+    <p>A call you can make when you don't feel safe. Someone talks with you, the people you trust can see where you are, and one sentence quietly asks them for help.</p>
+  </header>
+
+  <div id="notices" aria-live="polite"></div>
+
+  <form id="settings" novalidate>
+    <section class="group">
+      <h2>You and your caller</h2>
+      <label class="field"><span>Your name</span>
+        <input id="userName" autocomplete="given-name" placeholder="First name">
+      </label>
+      <div class="row">
+        <label class="field"><span>Caller's name</span>
+          <input id="companionName" placeholder="Didi">
+        </label>
+        <label class="field"><span>They are your</span>
+          <select id="relation">
+            <option value="elder sister">Elder sister</option>
+            <option value="elder brother">Elder brother</option>
+            <option value="mother">Mother</option>
+            <option value="father">Father</option>
+            <option value="best friend">Best friend</option>
+            <option value="husband">Husband</option>
+          </select>
+        </label>
+      </div>
+      <label class="field"><span>Caller's voice</span>
+        <select id="voiceURI"><option value="">Automatic</option></select>
+      </label>
+      <label class="field"><span>You'll speak in</span>
+        <select id="lang">
+          <option value="en-IN">English (India)</option>
+          <option value="hi-IN">Hindi</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="en-US">English (US)</option>
+        </select>
+      </label>
+      <button type="button" id="previewVoice" class="link">Hear this voice</button>
+    </section>
+
+    <section class="group">
+      <h2>Your code phrase</h2>
+      <label class="field"><span>Code phrase</span>
+        <input id="codePhrase" autocomplete="off">
+      </label>
+      <p class="hint">Say this during the call and your contacts get your location straight away, without anyone nearby knowing. Pick something you'd say on a normal call. Tapping the caller's photo three times does the same.</p>
+    </section>
+
+    <section class="group">
+      <h2>Trusted contacts</h2>
+      <ol class="steps">
+        <li>Ask each person to open <a id="botLink" href="https://telegram.org" target="_blank" rel="noopener">your Telegram bot</a> and send <code>/start</code>.</li>
+        <li>Find them here and tick who should get alerts.</li>
+      </ol>
+      <div class="actions">
+        <button type="button" id="findContacts" class="secondary">Find contacts</button>
+        <button type="button" id="testAlert" class="secondary">Send a test message</button>
+      </div>
+      <ul id="contactList" class="contacts"></ul>
+      <p id="contactStatus" class="hint" aria-live="polite"></p>
+    </section>
+
+    <section class="group">
+      <h2>During the call</h2>
+      <label class="check"><input type="checkbox" id="shareLocation">
+        <span>Share my live location as soon as the call starts</span></label>
+      <label class="check"><input type="checkbox" id="captions">
+        <span>Show captions on the call screen (useful for demos)</span></label>
+    </section>
+  </form>
+
+  <div class="dock">
+    <button type="button" id="startCall" class="start">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Start call
+    </button>
+  </div>
+</main>
+
+<section id="call" class="call" hidden aria-label="Call in progress">
+  <div class="call-head">
+    <button type="button" id="avatar" class="avatar" aria-label="Caller photo"><span id="avatarInitial">D</span></button>
+    <h2 id="callName">Didi</h2>
+    <p class="call-sub">Mobile</p>
+    <p id="callTimer" class="call-timer">Calling…</p>
+    <p id="callStatus" class="call-status" hidden></p>
+  </div>
+
+  <div id="captionBox" class="captions" hidden aria-live="polite"></div>
+
+  <div class="call-foot">
+    <div class="call-actions">
+      <button type="button" id="muteBtn" class="ctl" aria-pressed="false">
+        <span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg></span>
+        <span>Mute</span>
+      </button>
+      <button type="button" id="speakerBtn" class="ctl" aria-pressed="true">
+        <span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></span>
+        <span>Speaker</span>
+      </button>
+    </div>
+    <button type="button" id="endBtn" class="end" aria-label="End call">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    </button>
+  </div>
+</section>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
