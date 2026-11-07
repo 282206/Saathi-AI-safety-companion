@@ -2,7 +2,8 @@
 
 An AI phone call that keeps you company when you don't feel safe, and quietly alerts the people you trust the moment you say a code phrase.
 
-**Track:** Artificial Intelligence, also submitted for the Women Safety award.
+live website: https://saathi-ai-safety-companion.onrender.com/
+
 
 ## The problem
 
