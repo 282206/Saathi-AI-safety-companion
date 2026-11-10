@@ -4,6 +4,8 @@ An AI phone call that keeps you company when you don't feel safe, and quietly al
 
 **Track:** Artificial Intelligence, also submitted for the Women Safety award.
 
+live website: saathi-ai-safety-companion.onrender.com/
+
 ## The problem
 
 Many women travel alone at night: in cabs and autos, walking home from a station, or leaving a late shift. When a situation starts to feel wrong, the usual advice is to call someone and stay on the phone. But there isn't always someone free to pick up, and the safety apps that exist assume you can openly press a panic button. That's hard to do when the person making you uneasy is sitting beside you, watching your screen, and doing it openly can make things worse.
