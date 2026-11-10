@@ -80,6 +80,20 @@
     </section>
 
     <section class="group">
+      <h2>Quick location share</h2>
+      <p class="hint">Send your current location to one trusted contact on Telegram. This does not start an AI call or live location sharing.</p>
+      <label class="field"><span>Send location to</span>
+        <select id="locationContact">
+          <option value="">Find contacts first</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button type="button" id="sendLocation" class="secondary">Send my current location</button>
+      </div>
+      <p id="locationStatus" class="hint" aria-live="polite"></p>
+    </section>
+
+    <section class="group">
       <h2>During the call</h2>
       <label class="check"><input type="checkbox" id="shareLocation">
         <span>Share my live location as soon as the call starts</span></label>

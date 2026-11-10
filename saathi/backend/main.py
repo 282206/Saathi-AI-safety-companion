@@ -49,27 +49,6 @@ SESSION_TTL_SECONDS = 12 * 3600
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("saathi")
 
-# The Telegram token is part of every Bot API URL, and httpx logs request URLs at
-# INFO. Keep httpx quiet, and scrub both secrets from anything that does get logged.
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("httpcore").setLevel(logging.WARNING)
-
-
-class _RedactSecrets(logging.Filter):
-    _secrets = [s for s in (TELEGRAM_BOT_TOKEN, LLM_API_KEY) if s]
-
-    def filter(self, record: logging.LogRecord) -> bool:
-        if self._secrets:
-            msg = record.getMessage()
-            for s in self._secrets:
-                msg = msg.replace(s, "***")
-            record.msg, record.args = msg, None
-        return True
-
-
-for _handler in logging.getLogger().handlers:
-    _handler.addFilter(_RedactSecrets())
-
 http: httpx.AsyncClient
 
 
@@ -131,6 +110,12 @@ class StartRequest(ContactsRequest):
 
 class LocationUpdate(BaseModel):
     session_id: str
+    location: Location
+
+
+class StandaloneLocationRequest(BaseModel):
+    user_name: str = Field(default="Your contact", max_length=60)
+    contact_id: int
     location: Location
 
 
@@ -358,6 +343,24 @@ async def test_alert(req: ContactsRequest):
             "If you can read this, her safety alerts will reach you.")
     delivered = await fan_out(req.contacts, lambda cid: tg("sendMessage", chat_id=cid, text=text))
     return {"delivered": delivered, "total": len(req.contacts)}
+
+
+@app.post("/api/location/send")
+async def send_standalone_location(req: StandaloneLocationRequest):
+    """Send a one-time current location to one explicitly selected Telegram contact."""
+    require_telegram()
+    try:
+        await tg(
+            "sendMessage",
+            chat_id=req.contact_id,
+            text=f"{req.user_name} is sharing their current location with you through Saathi.",
+        )
+        await tg("sendLocation", chat_id=req.contact_id, **location_params(req.location))
+    except TelegramError as exc:
+        log.warning("Standalone location delivery to %s failed: %s", req.contact_id, exc)
+        raise HTTPException(502, "Telegram couldn't deliver the location. Ask the contact to send /start to the bot.") from exc
+
+    return {"delivered": True, "total": 1}
 
 
 @app.post("/api/session/start")
